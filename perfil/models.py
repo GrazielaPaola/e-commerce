@@ -53,7 +53,7 @@ class Perfil(models.Model):
     )
 
     def __str__(self):
-        return f'{self.usuario.first_name} {self.usuario.last_name}'
+        return f'{self.usuario}'
 
     def clean(self):
         error_messages = {}
@@ -61,9 +61,11 @@ class Perfil(models.Model):
         if not valida_cpf(self.cpf):
             error_messages['cpf'] = 'Digite um CPF válido'
 
-        if re.search(r'[^0-9]', self.cep):
-            error_messages['cep'] = 'CEP válido, digite apenas números'
+        if re.search(r'[^0-9]', self.cep) or len(self.cep) < 8:
+            error_messages['cep'] = 'CEP inválido, digite os 8 digitos do CEP.'
 
+        if error_messages:
+            raise ValidationError(error_messages)
     class Meta:
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'
